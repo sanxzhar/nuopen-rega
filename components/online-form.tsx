@@ -364,7 +364,10 @@ export default function RegistrationForm() {
               <Button
                 size="icon"
                 variant="destructive"
-                onClick={() => remove(index)}
+                onClick={() => {
+                  remove(index);
+                  setTeammatesCount((prev) => prev - 1);
+                }}
               >
                 <TrashIcon className="w-4 h-4" />
               </Button>

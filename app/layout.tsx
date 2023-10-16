@@ -1,12 +1,9 @@
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "NUOPEN 2023 registration",
@@ -20,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -42,7 +39,7 @@ export default function RootLayout({
             </Link>
           </header>
 
-          <main className="flex justify-center">{children}</main>
+          <main className="flex justify-center px-4 lg:px-0">{children}</main>
 
           <footer className="w-full container flex justify-center py-8 text-muted-foreground text-sm">
             nuopen 2023 by ACM SC

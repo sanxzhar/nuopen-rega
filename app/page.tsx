@@ -1,6 +1,8 @@
+import OnlineForm from "@/components/online-form";
 import RegistrationForm from "@/components/registration-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LightbulbIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlobeIcon, LightbulbIcon, MapPinnedIcon } from "lucide-react";
 
 export default function Home() {
   return (
@@ -21,10 +23,30 @@ export default function Home() {
               verification of <b>ALL MEMBERS</b> to Google Drive and made it
               public.
             </p>
+            <p className="mt-2 text-sm text-muted-foreground text-align-justify">
+              Note: data is not saved upon reloading the page.
+            </p>
           </CardContent>
         </Card>
       </div>
-      <RegistrationForm />
+      <Tabs defaultValue="offline">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="offline">
+            <MapPinnedIcon className="w-4 h-4 mr-2" />
+            Offline
+          </TabsTrigger>
+          <TabsTrigger value="online">
+            <GlobeIcon className="w-4 h-4 mr-2" />
+            Online
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="offline">
+          <RegistrationForm />
+        </TabsContent>
+        <TabsContent value="online">
+          <OnlineForm />
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }

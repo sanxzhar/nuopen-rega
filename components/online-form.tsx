@@ -125,6 +125,12 @@ export default function RegistrationForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitLoading(true);
     // TODO: connect to backend
+    // Take fields from value and assign them to fields per backend specification
+    // JSON.stringify and place it into fetch() call body
+    // wait for the result and then you can display success/failure with:
+    // https://ui.shadcn.com/docs/components/toast
+    // or
+    // https://sonner.emilkowal.ski/
     const mode = "offline";
     console.log(values);
     setSubmitLoading(false);

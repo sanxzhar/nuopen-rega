@@ -1,5 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,7 +29,7 @@ export default function RootLayout({
             <Image
               src="/hero-logo.svg"
               width={200}
-              height={100}
+              height={32}
               alt={"nuopen 2023"}
             />
             <Link
@@ -45,6 +46,7 @@ export default function RootLayout({
             nuopen 2023 by ACM SC
           </footer>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

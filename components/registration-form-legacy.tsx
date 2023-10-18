@@ -41,7 +41,7 @@ import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 
-const MIN_AGE = 0;
+const MIN_AGE = 16;
 
 const unis = [
   { label: "NU", value: "nu" },
@@ -87,7 +87,11 @@ const participantSchema = z.object({
     .min(3)
     .url()
     .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" }),
-  cert: z.string({ required_error: "This document is required" }).optional(),
+  cert: z
+    .string({ required_error: "This document is required" })
+    .min(3)
+    .url()
+    .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" }),
 });
 
 const formSchema = z.object({
@@ -113,7 +117,10 @@ function RequiredSpan() {
   return <span className="text-destructive font-bold"> *</span>;
 }
 
-export default function RegistrationForm() {
+export default function RegistrationFormLegacy() {
+  const [teammatesCount, setTeammatesCount] = useState(0);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -140,9 +147,6 @@ export default function RegistrationForm() {
     name: "teammates",
     control: form.control,
   });
-
-  const [teammatesCount, setTeammatesCount] = useState(0);
-  const [submitLoading, setSubmitLoading] = useState(false);
 
   return (
     <Form {...form}>
@@ -222,9 +226,9 @@ export default function RegistrationForm() {
                   <FormControl>
                     <Input placeholder="" inputMode="numeric" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
+                  <FormDescription>
                     16+ for Offline participation.
-                  </FormDescription> */}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -345,14 +349,11 @@ export default function RegistrationForm() {
                 <FormItem>
                   <FormLabel>
                     Document proving study at an educational institution
-                    {/* <RequiredSpan /> */}
+                    <RequiredSpan />
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="https://drive.google.com/" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Not required for online participation
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -426,9 +427,9 @@ export default function RegistrationForm() {
                     <FormControl>
                       <Input placeholder="" inputMode="numeric" {...field} />
                     </FormControl>
-                    {/* <FormDescription>
+                    <FormDescription>
                       16+ for Offline participation.
-                    </FormDescription> */}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -554,7 +555,7 @@ export default function RegistrationForm() {
                   <FormItem>
                     <FormLabel>
                       Document proving study at an educational institution
-                      {/* <RequiredSpan /> */}
+                      <RequiredSpan />
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -562,9 +563,7 @@ export default function RegistrationForm() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Not required for online participation
-                    </FormDescription>
+
                     <FormMessage />
                   </FormItem>
                 )}

@@ -1,4 +1,3 @@
-import OnlineForm from "@/components/online-form";
 import RegistrationForm from "@/components/registration-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,10 +40,10 @@ export default function Home() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="offline">
-          <RegistrationForm />
+          <RegistrationForm online={false} />
         </TabsContent>
         <TabsContent value="online">
-          <OnlineForm />
+          <RegistrationForm online={true} />
         </TabsContent>
       </Tabs>
     </section>

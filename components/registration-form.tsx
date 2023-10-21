@@ -178,16 +178,16 @@ export default function RegistrationForm({ online }: { online: boolean }) {
       const payload = {
         participation_mode: online == true ? "on" : "off",
         team_name: values.teamName,
-        captain_name: values.teammates[0].name,
-        captain_surname: values.teammates[0].surname,
-        captain_email: values.teammates[0].email,
-        captain_gender: values.teammates[0].gender,
-        captain_age: values.teammates[0].age,
-        captain_uni: values.teammates[0].uni,
-        captain_year: values.teammates[0].studyYear,
-        captain_major: values.teammates[0].major,
-        captain_CV: values.teammates[0].cv,
-        captain_confirmation: values.teammates[0].cert
+        captian_name: values.teammates[0].name,
+        captian_surname: values.teammates[0].surname,
+        captian_email: values.teammates[0].email,
+        captian_gender: values.teammates[0].gender,
+        captian_age: values.teammates[0].age,
+        captian_uni: values.teammates[0].uni,
+        captian_year: values.teammates[0].studyYear,
+        captian_major: values.teammates[0].major,
+        captian_CV: values.teammates[0].cv,
+        captian_confirmation: values.teammates[0].cert
           ? values.teammates[0].cert
           : null,
         member2_name: values.teammates[1] ? values.teammates[1].name : null,

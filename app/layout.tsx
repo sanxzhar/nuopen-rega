@@ -7,7 +7,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NUOPEN 2023 registration",
+  title: "NU Open | Registration",
   description: "Create. Explore. Divide. Conquer",
 };
 

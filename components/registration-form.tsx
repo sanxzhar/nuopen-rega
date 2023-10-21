@@ -1,5 +1,6 @@
 "use client";
 
+import postTeam from "@/app/api/postTeam";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -36,6 +37,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -113,6 +115,7 @@ export function getSchema(online: boolean) {
         required_error: "Please select your year of study",
       })
       .min(1, { message: "Please select your year of study" }),
+    major: z.string({ required_error: "Please enter the major" }),
     cv: z
       .string({ required_error: "CV is required" })
       .min(3)
@@ -156,6 +159,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
     email: "",
     uni: "",
     studyYear: "",
+    major: "",
     cv: "",
     cert: "",
   };
@@ -169,10 +173,50 @@ export default function RegistrationForm({ online }: { online: boolean }) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+
+    axios.post(`http://195.93.152.115/api/register/`, {
+      "participation_mode" : online == true ? "on" : "off",
+      "team_name": values.teamName,
+      "captain_name": values.teammates[0].name,
+      "captain_surname": values.teammates[0].surname,
+      "captain_email": values.teammates[0].email,
+      "captain_gender": values.teammates[0].gender,
+      "captain_age": values.teammates[0].age,
+      "captain_uni": values.teammates[0].uni,
+      "captain_year": values.teammates[0].studyYear,
+      "captain_major": values.teammates[0].major,
+      "captain_cv": values.teammates[0].cv,
+      "captain_confirmation": values.teammates[0].cert ? values.teammates[0].cert : null,
+      "member2_name": values.teammates[1] ? values.teammates[1].name : null,
+      "member2_surname": values.teammates[1] ? values.teammates[1].surname : null,
+      "member2_email": values.teammates[1] ? values.teammates[1].email : null,
+      "member2_gender": values.teammates[1] ? values.teammates[1].gender : null,
+      "member2_age": values.teammates[1] ? values.teammates[1].age : null,
+      "member2_uni": values.teammates[1] ? values.teammates[1].uni : null,
+      "member2_year": values.teammates[1] ? values.teammates[1].studyYear : null,
+      "member2_major": values.teammates[1] ? values.teammates[1].major : null,
+      "member2_cv": values.teammates[1] ? values.teammates[1].cv : null,
+      "member2_confirmation": values.teammates[1] ? values.teammates[1].cert ? values.teammates[1].cert : null : null,
+      "member3_name": values.teammates[2] ? values.teammates[2].name : null,
+      "member3_surname": values.teammates[2] ? values.teammates[2].surname : null,
+      "member3_email": values.teammates[2] ? values.teammates[2].email : null,
+      "member3_gender": values.teammates[2] ? values.teammates[2].gender : null,
+      "member3_age": values.teammates[2] ? values.teammates[2].age : null,
+      "member3_uni": values.teammates[2] ? values.teammates[2].uni : null,
+      "member3_year": values.teammates[2] ? values.teammates[2].studyYear : null,
+      "member3_major": values.teammates[2] ? values.teammates[2].major : null,
+      "member3_cv": values.teammates[2] ? values.teammates[2].cv : null,
+      "member3_confirmation": values.teammates[2] ? values.teammates[2].cert ? values.teammates[2].cert : null : null,
+      "accepted": true,
+    })
+
+    // const team = {
+    // }
+
+    // console.log(team)
+    // postTeam(team)
     setSubmitLoading(true);
-
     console.log(values);
-
     await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
 
     try {
@@ -437,6 +481,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
                 )}
               />
 
+
               <FormField
                 control={form.control}
                 name={`teammates.${index}.studyYear`}
@@ -466,6 +511,23 @@ export default function RegistrationForm({ online }: { online: boolean }) {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                  control={form.control}
+                  name={`teammates.${index}.major`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Major
+                        <RequiredSpan />
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Computer Science" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />  
 
               <FormField
                 control={form.control}

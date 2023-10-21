@@ -98,7 +98,7 @@ const formSchema = z.object({
   teamName: z.string({ required_error: "Please enter your team name" }).min(2),
   captain: participantSchema,
   teammates: z.array(participantSchema).optional(),
-  acceptToS: z.literal<boolean>(true),
+  participation_mode: z.literal<boolean>(true),
 });
 
 const emptyTeamMember: z.infer<typeof participantSchema> = {
@@ -594,7 +594,7 @@ export default function RegistrationFormLegacy() {
 
         <FormField
           control={form.control}
-          name="acceptToS"
+          name="participation_mode"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-8">
               <FormControl>

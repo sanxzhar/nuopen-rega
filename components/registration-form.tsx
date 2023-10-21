@@ -1,6 +1,5 @@
 "use client";
 
-import postTeam from "@/app/api/postTeam";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,7 +36,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -57,7 +56,7 @@ const DRIVE_PREFIX = "https://drive.google.com/";
 const unis = [
   { label: "NU", value: "nu" },
   { label: "AITU", value: "aitu" },
-  { label: "ENU", value: "enu" },
+  // { label: "ENU", value: "enu" },
   { label: "KBTU", value: "kbtu" },
   { label: "SDU", value: "sdu" },
   { label: "School", value: "school" },
@@ -67,17 +66,17 @@ const unis = [
 // const studyYears = ["found", "1", "2", "3", "4", "grad", "school"] as const;
 const studyYears = [
   { label: "Foundation year", value: "found" },
-  { label: "1st year Bachelor", value: "1" },
-  { label: "2nd year Bachelor", value: "2" },
-  { label: "3rd year Bachelor", value: "3" },
-  { label: "4th year Bachelor", value: "4" },
+  { label: "1st year Bachelor", value: "first" },
+  { label: "2nd year Bachelor", value: "second" },
+  { label: "3rd year Bachelor", value: "third" },
+  { label: "4th year Bachelor", value: "forth" },
   { label: "Graduated Bachelor", value: "grad" },
   { label: "School student", value: "school" },
 ] as const;
 
 const genders = [
-  { label: "Male", value: "male" },
-  { label: "Female", value: "female" },
+  { label: "Male", value: "m" },
+  { label: "Female", value: "f" },
   { label: "Other/Prefer not to say", value: "other" },
 ];
 
@@ -173,84 +172,112 @@ export default function RegistrationForm({ online }: { online: boolean }) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-
-    axios.post(`http://195.93.152.115/api/register/`, {
-      "participation_mode" : online == true ? "on" : "off",
-      "team_name": values.teamName,
-      "captain_name": values.teammates[0].name,
-      "captain_surname": values.teammates[0].surname,
-      "captain_email": values.teammates[0].email,
-      "captain_gender": values.teammates[0].gender,
-      "captain_age": values.teammates[0].age,
-      "captain_uni": values.teammates[0].uni,
-      "captain_year": values.teammates[0].studyYear,
-      "captain_major": values.teammates[0].major,
-      "captain_cv": values.teammates[0].cv,
-      "captain_confirmation": values.teammates[0].cert ? values.teammates[0].cert : null,
-      "member2_name": values.teammates[1] ? values.teammates[1].name : null,
-      "member2_surname": values.teammates[1] ? values.teammates[1].surname : null,
-      "member2_email": values.teammates[1] ? values.teammates[1].email : null,
-      "member2_gender": values.teammates[1] ? values.teammates[1].gender : null,
-      "member2_age": values.teammates[1] ? values.teammates[1].age : null,
-      "member2_uni": values.teammates[1] ? values.teammates[1].uni : null,
-      "member2_year": values.teammates[1] ? values.teammates[1].studyYear : null,
-      "member2_major": values.teammates[1] ? values.teammates[1].major : null,
-      "member2_cv": values.teammates[1] ? values.teammates[1].cv : null,
-      "member2_confirmation": values.teammates[1] ? values.teammates[1].cert ? values.teammates[1].cert : null : null,
-      "member3_name": values.teammates[2] ? values.teammates[2].name : null,
-      "member3_surname": values.teammates[2] ? values.teammates[2].surname : null,
-      "member3_email": values.teammates[2] ? values.teammates[2].email : null,
-      "member3_gender": values.teammates[2] ? values.teammates[2].gender : null,
-      "member3_age": values.teammates[2] ? values.teammates[2].age : null,
-      "member3_uni": values.teammates[2] ? values.teammates[2].uni : null,
-      "member3_year": values.teammates[2] ? values.teammates[2].studyYear : null,
-      "member3_major": values.teammates[2] ? values.teammates[2].major : null,
-      "member3_cv": values.teammates[2] ? values.teammates[2].cv : null,
-      "member3_confirmation": values.teammates[2] ? values.teammates[2].cert ? values.teammates[2].cert : null : null,
-      "accepted": true,
-    })
-
-    // const team = {
-    // }
-
-    // console.log(team)
-    // postTeam(team)
-    setSubmitLoading(true);
-    console.log(values);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
-
     try {
-      // TODO: Replace 'your-backend-url' with the actual URL of your backend endpoint
-      // const response = await fetch("your-backend-url", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(values),
-      //   // TODO: Adapt the values object based on swagger
-      // });
+      setSubmitLoading(true);
 
-      // // Check if the request was successful
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok " + response.statusText);
-      // }
+      const response = await axios.post(
+        `https://api.open.nuacm.kz/api/register/`,
+        {
+          participation_mode: online == true ? "on" : "off",
+          team_name: values.teamName,
+          captain_name: values.teammates[0].name,
+          captain_surname: values.teammates[0].surname,
+          captain_email: values.teammates[0].email,
+          captain_gender: values.teammates[0].gender,
+          captain_age: values.teammates[0].age,
+          captain_uni: values.teammates[0].uni,
+          captain_year: values.teammates[0].studyYear,
+          captain_major: values.teammates[0].major,
+          captain_cv: values.teammates[0].cv,
+          captain_confirmation: values.teammates[0].cert
+            ? values.teammates[0].cert
+            : null,
+          member2_name: values.teammates[1] ? values.teammates[1].name : null,
+          member2_surname: values.teammates[1]
+            ? values.teammates[1].surname
+            : null,
+          member2_email: values.teammates[1] ? values.teammates[1].email : null,
+          member2_gender: values.teammates[1]
+            ? values.teammates[1].gender
+            : null,
+          member2_age: values.teammates[1] ? values.teammates[1].age : null,
+          member2_uni: values.teammates[1] ? values.teammates[1].uni : null,
+          member2_year: values.teammates[1]
+            ? values.teammates[1].studyYear
+            : null,
+          member2_major: values.teammates[1] ? values.teammates[1].major : null,
+          member2_cv: values.teammates[1] ? values.teammates[1].cv : null,
+          member2_confirmation: values.teammates[1]
+            ? values.teammates[1].cert
+              ? values.teammates[1].cert
+              : null
+            : null,
+          member3_name: values.teammates[2] ? values.teammates[2].name : null,
+          member3_surname: values.teammates[2]
+            ? values.teammates[2].surname
+            : null,
+          member3_email: values.teammates[2] ? values.teammates[2].email : null,
+          member3_gender: values.teammates[2]
+            ? values.teammates[2].gender
+            : null,
+          member3_age: values.teammates[2] ? values.teammates[2].age : null,
+          member3_uni: values.teammates[2] ? values.teammates[2].uni : null,
+          member3_year: values.teammates[2]
+            ? values.teammates[2].studyYear
+            : null,
+          member3_major: values.teammates[2] ? values.teammates[2].major : null,
+          member3_cv: values.teammates[2] ? values.teammates[2].cv : null,
+          member3_confirmation: values.teammates[2]
+            ? values.teammates[2].cert
+              ? values.teammates[2].cert
+              : null
+            : null,
+          accepted: true,
+        }
+      );
 
-      // TODO: handle the response from the server
-      // const responseData = await response.json();
-      // console.log(responseData);
-
-      // You might want to show a success toast here
-      toast({
-        variant: "default",
-        title: "Success! 🎉",
-        description: "Your data has been submitted successfully.",
-      });
+      // Check if the response status indicates success
+      if (response.status >= 200 && response.status < 300) {
+        toast({
+          variant: "default",
+          title: "Success! 🎉",
+          description: "Your data has been submitted successfully.",
+        });
+      } else {
+        throw new Error("Unexpected response from server");
+      }
     } catch (error) {
-      console.error(error);
+      let errorMessage = "There was a problem with your request.";
+      if (error instanceof AxiosError) {
+        if (error && error.message === "Network Error") {
+          errorMessage =
+            "Network error. Please check your internet connection.";
+        } else if (error.response) {
+          if (
+            error.response.status === 400 &&
+            error.response.data.team_name &&
+            error.response.data.team_name[0] ===
+              "team with this team name already exists."
+          ) {
+            errorMessage =
+              "The team name you've chosen already exists. Please choose a different name.";
+            form.setError("teamName", {
+              type: "manual",
+              message: errorMessage,
+            });
+          } else {
+            errorMessage = error.response.data.message || errorMessage;
+          }
+        }
+        console.error(error.message);
+        // ... other error handling logic
+      } else {
+        console.error("Unknown error:", error);
+      }
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: errorMessage,
       });
     } finally {
       setSubmitLoading(false);
@@ -481,7 +508,6 @@ export default function RegistrationForm({ online }: { online: boolean }) {
                 )}
               />
 
-
               <FormField
                 control={form.control}
                 name={`teammates.${index}.studyYear`}
@@ -513,21 +539,21 @@ export default function RegistrationForm({ online }: { online: boolean }) {
               />
 
               <FormField
-                  control={form.control}
-                  name={`teammates.${index}.major`}
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>
-                        Major
-                        <RequiredSpan />
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Computer Science" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />  
+                control={form.control}
+                name={`teammates.${index}.major`}
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>
+                      Major
+                      <RequiredSpan />
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Computer Science" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

@@ -188,7 +188,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
           captain_uni: values.teammates[0].uni,
           captain_year: values.teammates[0].studyYear,
           captain_major: values.teammates[0].major,
-          captain_cv: values.teammates[0].cv,
+          captain_CV: values.teammates[0].cv,
           captain_confirmation: values.teammates[0].cert
             ? values.teammates[0].cert
             : null,
@@ -206,7 +206,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
             ? values.teammates[1].studyYear
             : null,
           member2_major: values.teammates[1] ? values.teammates[1].major : null,
-          member2_cv: values.teammates[1] ? values.teammates[1].cv : null,
+          member2_CV: values.teammates[1] ? values.teammates[1].cv : null,
           member2_confirmation: values.teammates[1]
             ? values.teammates[1].cert
               ? values.teammates[1].cert
@@ -226,13 +226,12 @@ export default function RegistrationForm({ online }: { online: boolean }) {
             ? values.teammates[2].studyYear
             : null,
           member3_major: values.teammates[2] ? values.teammates[2].major : null,
-          member3_cv: values.teammates[2] ? values.teammates[2].cv : null,
+          member3_CV: values.teammates[2] ? values.teammates[2].cv : null,
           member3_confirmation: values.teammates[2]
             ? values.teammates[2].cert
               ? values.teammates[2].cert
               : null
             : null,
-          accepted: true,
         }
       );
 

@@ -175,64 +175,64 @@ export default function RegistrationForm({ online }: { online: boolean }) {
     try {
       setSubmitLoading(true);
 
+      const payload = {
+        participation_mode: online == true ? "on" : "off",
+        team_name: values.teamName,
+        captain_name: values.teammates[0].name,
+        captain_surname: values.teammates[0].surname,
+        captain_email: values.teammates[0].email,
+        captain_gender: values.teammates[0].gender,
+        captain_age: values.teammates[0].age,
+        captain_uni: values.teammates[0].uni,
+        captain_year: values.teammates[0].studyYear,
+        captain_major: values.teammates[0].major,
+        captain_CV: values.teammates[0].cv,
+        captain_confirmation: values.teammates[0].cert
+          ? values.teammates[0].cert
+          : null,
+        member2_name: values.teammates[1] ? values.teammates[1].name : null,
+        member2_surname: values.teammates[1]
+          ? values.teammates[1].surname
+          : null,
+        member2_email: values.teammates[1] ? values.teammates[1].email : null,
+        member2_gender: values.teammates[1] ? values.teammates[1].gender : null,
+        member2_age: values.teammates[1] ? values.teammates[1].age : null,
+        member2_uni: values.teammates[1] ? values.teammates[1].uni : null,
+        member2_year: values.teammates[1]
+          ? values.teammates[1].studyYear
+          : null,
+        member2_major: values.teammates[1] ? values.teammates[1].major : null,
+        member2_CV: values.teammates[1] ? values.teammates[1].cv : null,
+        member2_confirmation: values.teammates[1]
+          ? values.teammates[1].cert
+            ? values.teammates[1].cert
+            : null
+          : null,
+        member3_name: values.teammates[2] ? values.teammates[2].name : null,
+        member3_surname: values.teammates[2]
+          ? values.teammates[2].surname
+          : null,
+        member3_email: values.teammates[2] ? values.teammates[2].email : null,
+        member3_gender: values.teammates[2] ? values.teammates[2].gender : null,
+        member3_age: values.teammates[2] ? values.teammates[2].age : null,
+        member3_uni: values.teammates[2] ? values.teammates[2].uni : null,
+        member3_year: values.teammates[2]
+          ? values.teammates[2].studyYear
+          : null,
+        member3_major: values.teammates[2] ? values.teammates[2].major : null,
+        member3_CV: values.teammates[2] ? values.teammates[2].cv : null,
+        member3_confirmation: values.teammates[2]
+          ? values.teammates[2].cert
+            ? values.teammates[2].cert
+            : null
+          : null,
+      };
+
+      console.log(payload);
+
       const response = await axios.post(
         `https://api.open.nuacm.kz/api/register/`,
-        {
-          participation_mode: online == true ? "on" : "off",
-          team_name: values.teamName,
-          captain_name: values.teammates[0].name,
-          captain_surname: values.teammates[0].surname,
-          captain_email: values.teammates[0].email,
-          captain_gender: values.teammates[0].gender,
-          captain_age: values.teammates[0].age,
-          captain_uni: values.teammates[0].uni,
-          captain_year: values.teammates[0].studyYear,
-          captain_major: values.teammates[0].major,
-          captain_CV: values.teammates[0].cv,
-          captain_confirmation: values.teammates[0].cert
-            ? values.teammates[0].cert
-            : null,
-          member2_name: values.teammates[1] ? values.teammates[1].name : null,
-          member2_surname: values.teammates[1]
-            ? values.teammates[1].surname
-            : null,
-          member2_email: values.teammates[1] ? values.teammates[1].email : null,
-          member2_gender: values.teammates[1]
-            ? values.teammates[1].gender
-            : null,
-          member2_age: values.teammates[1] ? values.teammates[1].age : null,
-          member2_uni: values.teammates[1] ? values.teammates[1].uni : null,
-          member2_year: values.teammates[1]
-            ? values.teammates[1].studyYear
-            : null,
-          member2_major: values.teammates[1] ? values.teammates[1].major : null,
-          member2_CV: values.teammates[1] ? values.teammates[1].cv : null,
-          member2_confirmation: values.teammates[1]
-            ? values.teammates[1].cert
-              ? values.teammates[1].cert
-              : null
-            : null,
-          member3_name: values.teammates[2] ? values.teammates[2].name : null,
-          member3_surname: values.teammates[2]
-            ? values.teammates[2].surname
-            : null,
-          member3_email: values.teammates[2] ? values.teammates[2].email : null,
-          member3_gender: values.teammates[2]
-            ? values.teammates[2].gender
-            : null,
-          member3_age: values.teammates[2] ? values.teammates[2].age : null,
-          member3_uni: values.teammates[2] ? values.teammates[2].uni : null,
-          member3_year: values.teammates[2]
-            ? values.teammates[2].studyYear
-            : null,
-          member3_major: values.teammates[2] ? values.teammates[2].major : null,
-          member3_CV: values.teammates[2] ? values.teammates[2].cv : null,
-          member3_confirmation: values.teammates[2]
-            ? values.teammates[2].cert
-              ? values.teammates[2].cert
-              : null
-            : null,
-        }
+        payload
       );
 
       // Check if the response status indicates success

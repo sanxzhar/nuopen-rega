@@ -117,15 +117,16 @@ export function getSchema(online: boolean) {
     major: z.string({ required_error: "Please enter the major" }),
     cv: z
       .string()
-      .min(3)
       .url()
       .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
+      .or(z.literal(""))
       .optional(),
     cert: online
       ? z
           .string()
           .url()
           .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
+          .or(z.literal(""))
           .optional()
       : z
           .string({ required_error: "This document is required" })

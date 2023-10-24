@@ -26,18 +26,28 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <header className="container py-8 flex justify-between">
-            <Image
-              src="/hero-logo.svg"
-              width={200}
-              height={32}
-              alt={"nuopen 2023"}
-            />
-            <Link
-              href="https://open.nuacm.kz"
-              className={buttonVariants({ variant: "destructive" })}
-            >
-              <span className="font-bold">Home</span>
+            <Link href="/">
+              <Image
+                src="/hero-logo.svg"
+                width={200}
+                height={32}
+                alt={"nuopen 2023"}
+              />
             </Link>
+            <div className="flex gap-4">
+              <Link
+                href="/list"
+                className={buttonVariants({ variant: "outline" })}
+              >
+                <span className="font-bold">Participants</span>
+              </Link>
+              <Link
+                href="https://open.nuacm.kz"
+                className={buttonVariants({ variant: "destructive" })}
+              >
+                <span className="font-bold">Home</span>
+              </Link>
+            </div>
           </header>
 
           <main className="flex justify-center px-4 lg:px-0">{children}</main>

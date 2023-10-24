@@ -116,10 +116,11 @@ export function getSchema(online: boolean) {
       .min(1, { message: "Please select your year of study" }),
     major: z.string({ required_error: "Please enter the major" }),
     cv: z
-      .string({ required_error: "CV is required" })
+      .string()
       .min(3)
       .url()
-      .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" }),
+      .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
+      .optional(),
     cert: online
       ? z
           .string()
@@ -560,12 +561,16 @@ export default function RegistrationForm({ online }: { online: boolean }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      CV/Resume Link
-                      <RequiredSpan />
+                      CV/Resume Link (Optional)
+                      {/* <RequiredSpan /> */}
                     </FormLabel>
                     <FormControl>
                       <Input placeholder={DRIVE_PREFIX} {...field} />
                     </FormControl>
+                    <FormDescription>
+                      Upload your CV to be shared with our sponsors for
+                      potential employment opportunities.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -583,9 +588,15 @@ export default function RegistrationForm({ online }: { online: boolean }) {
                     <FormControl>
                       <Input placeholder={DRIVE_PREFIX} {...field} />
                     </FormControl>
-                    {online && (
+                    {online ? (
                       <FormDescription>
-                        Not required for online participation
+                        Not required for online participation.
+                      </FormDescription>
+                    ) : (
+                      <FormDescription>
+                        You can attach enrollment verification with graduation
+                        date, official/unofficial transcript or Spravka. Must
+                        have a date of September 2023 or later.
                       </FormDescription>
                     )}
                     <FormMessage />

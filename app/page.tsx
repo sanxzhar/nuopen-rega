@@ -23,6 +23,10 @@ export default function Home() {
               public.
             </p>
             <p className="mt-2 text-sm text-muted-foreground text-align-justify">
+              Please note that the candidates with documents that are outdated
+              (dated earlier than September 2023) will be rejected.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground text-align-justify">
               Note: data is not saved upon reloading the page.
             </p>
           </CardContent>

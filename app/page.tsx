@@ -1,7 +1,5 @@
-import RegistrationForm from "@/components/registration-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GlobeIcon, LightbulbIcon, MapPinnedIcon } from "lucide-react";
+import { LightbulbIcon } from "lucide-react";
 
 export default function Home() {
   return (
@@ -32,7 +30,12 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-      <Tabs defaultValue="offline">
+      <div>
+        <p className="text-xl font-medium text-center">
+          Registration is closed
+        </p>
+      </div>
+      {/* <Tabs defaultValue="offline">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="offline">
             <MapPinnedIcon className="w-4 h-4 mr-2" />
@@ -49,7 +52,7 @@ export default function Home() {
         <TabsContent value="online">
           <RegistrationForm online={true} />
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </section>
   );
 }

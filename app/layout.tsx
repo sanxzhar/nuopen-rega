@@ -29,7 +29,7 @@ export default function RootLayout({
                 src="/logo.svg"
                 width={200}
                 height={32}
-                alt={"nuopen 2023"}
+                alt={"nuopen 2024"}
               />
             </Link>
             <div className="flex gap-4">

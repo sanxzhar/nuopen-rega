@@ -24,7 +24,7 @@ export default function RootLayout({
           forcedTheme="dark"
         >
           <header className="container py-8 flex justify-between">
-            <Link href="/">
+            <Link href="https://open.nuacm.kz/">
               <Image
                 src="/logo.svg"
                 width={200}

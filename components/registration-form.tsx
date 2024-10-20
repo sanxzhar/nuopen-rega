@@ -72,6 +72,7 @@ const studyYears = [
   { label: "4th year Bachelor", value: "forth" },
   { label: "Graduated Bachelor", value: "grad" },
   { label: "School student", value: "school" },
+  { label: "Other", value: "other" },
 ] as const;
 
 const genders = [
@@ -85,55 +86,82 @@ function getMinAge(online: boolean) {
 }
 
 export function getSchema(online: boolean) {
-  const participantSchema = z.object({
-    name: z.string({ required_error: "Please enter the name" }).min(3),
-    surname: z
-      .string({ required_error: "Please enter the surname" })
-      .min(3)
-      .max(40),
-    age: z.coerce
-      .number({ required_error: "Please enter the age" })
-      .min(getMinAge(online))
-      .max(40),
-    gender: z.z
-      .string({
-        required_error: "Please select your gender",
-      })
-      .min(1, { message: "Please select your gender" }),
-    email: z
-      .string({ required_error: "Please enter the email address" })
-      .min(3)
-      .email({ message: "Should be in email format. E.g: john@example.com" }),
-    uni: z
-      .string({
-        required_error: "Please select your University/School",
-      })
-      .min(1, { message: "Please select your university" }),
-    studyYear: z
-      .string({
-        required_error: "Please select your year of study",
-      })
-      .min(1, { message: "Please select your year of study" }),
-    major: z.string({ required_error: "Please enter the major" }),
-    cv: z
-      .string()
-      .url()
-      .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
-      .or(z.literal(""))
-      .optional(),
-    cert: online
-      ? z
-          .string()
-          .url()
-          .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
-          .or(z.literal(""))
-          .optional()
-      : z
-          .string({ required_error: "This document is required" })
-          .min(3)
-          .url()
-          .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" }),
-  });
+  const participantSchema = z
+    .object({
+      name: z.string({ required_error: "Please enter the name" }).min(3),
+      surname: z
+        .string({ required_error: "Please enter the surname" })
+        .min(3)
+        .max(40),
+      age: z.coerce
+        .number({ required_error: "Please enter the age" })
+        .min(getMinAge(online))
+        .max(40),
+      gender: z.z
+        .string({
+          required_error: "Please select your gender",
+        })
+        .min(1, { message: "Please select your gender" }),
+      email: z
+        .string({ required_error: "Please enter the email address" })
+        .min(3)
+        .email({ message: "Should be in email format. E.g: john@example.com" }),
+      uni: z.string().optional(),
+      studyYear: z.string().optional(),
+      major: z.string().optional(),
+      cv: z
+        .string()
+        .url()
+        .startsWith(DRIVE_PREFIX, { message: "Must be a Google Drive Link" })
+        .or(z.literal(""))
+        .optional(),
+      cert: z
+        .string()
+        .url()
+        .startsWith(DRIVE_PREFIX, {
+          message: "Must be a Google Drive Link",
+        })
+        .or(z.literal(""))
+        .optional(),
+    })
+    .refine(
+      (data) => {
+        if (data.uni) {
+          return data.major;
+        }
+        return true;
+      },
+      {
+        message: "Major is required if University is selected.",
+        path: ["major"],
+      }
+    )
+    .refine(
+      (data) => {
+        if (data.uni) {
+          return data.studyYear;
+        }
+
+        return true;
+      },
+      {
+        message: "Year of study is required if University is selected.",
+        path: ["studyYear"],
+      }
+    )
+    .refine(
+      (data) => {
+        if (data.uni) {
+          return (online || data.cert);
+        }
+
+        return true;
+      },
+      {
+        message: "Document is required if University is selected.",
+        path: ["cert"],
+      }
+    );
 
   const formSchema = z.object({
     teamName: z
@@ -151,6 +179,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
   const { formSchema, participantSchema } = getSchema(online);
   const [teammatesCount, setTeammatesCount] = useState(0);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [university, setUniversity] = useState("");
 
   const emptyTeamMember: z.infer<typeof participantSchema> = {
     name: "",
@@ -233,7 +262,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
       console.log(payload);
 
       const response = await axios.post(
-        `https://api.open.nuacm.kz/api/register/`,
+        `https://api.nuacm.kz/api/register/`,
         payload
       );
 
@@ -290,6 +319,8 @@ export default function RegistrationForm({ online }: { online: boolean }) {
     control: form.control,
   });
 
+  // form.getValues
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -300,7 +331,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
             <FormItem>
               <FormLabel className="text-xl font-bold">
                 Team Name
-                {!online && <RequiredSpan />}
+                <RequiredSpan />
               </FormLabel>
               <FormControl>
                 <Input placeholder="Abi, I have no idea" {...field} />
@@ -313,300 +344,299 @@ export default function RegistrationForm({ online }: { online: boolean }) {
           )}
         />
 
-        {fields.map((field, index) => (
-          <Card key={field.id}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xl font-bold flex items-center">
-                {index === 0 ? (
-                  <CrownIcon className="w-5 h-5 mr-2" />
-                ) : (
-                  <PersonStandingIcon className="w-5 h-5 mr-2" />
-                )}
-                {index === 0 ? `Captain` : `Participant #${index + 1}`}
-              </CardTitle>
-              <Button
-                size="icon"
-                variant="destructive"
-                disabled={index === 0}
-                onClick={() => {
-                  remove(index);
-                  setTeammatesCount((prev) => prev - 1);
-                }}
-              >
-                <TrashIcon className="w-4 h-4" />
-              </Button>
-            </CardHeader>
+        {fields.map((field, index) => {
+          const uniFilled = !!form.getValues(`teammates.${index}.uni`);
 
-            <CardContent className="space-y-4">
-              <div className="flex gap-4 w-full justify-between">
-                <FormField
-                  control={form.control}
-                  name={`teammates.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>
-                        Name
-                        <RequiredSpan />
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="John" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+          return (
+            <Card key={field.id}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-bold flex items-center">
+                  {index === 0 ? (
+                    <CrownIcon className="w-5 h-5 mr-2" />
+                  ) : (
+                    <PersonStandingIcon className="w-5 h-5 mr-2" />
                   )}
-                />
+                  {index === 0 ? `Captain` : `Participant #${index + 1}`}
+                </CardTitle>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  disabled={index === 0}
+                  onClick={() => {
+                    remove(index);
+                    setTeammatesCount((prev) => prev - 1);
+                  }}
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </Button>
+              </CardHeader>
 
-                <FormField
-                  control={form.control}
-                  name={`teammates.${index}.surname`}
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>
-                        Surname
-                        <RequiredSpan />
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.email`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email
-                      <RequiredSpan />
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="johndoe@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.age`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Age
-                      <RequiredSpan />
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="" inputMode="numeric" {...field} />
-                    </FormControl>
-                    {!online && (
-                      <FormDescription>
-                        16+ for Offline participation.
-                      </FormDescription>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.gender`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Gender <RequiredSpan />
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {genders.map((item, index) => (
-                          <SelectItem key={index} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.uni`}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>
-                      University/School
-                      <RequiredSpan />
-                    </FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
+              <CardContent className="space-y-4">
+                <div className="flex gap-4 w-full justify-between">
+                  <FormField
+                    control={form.control}
+                    name={`teammates.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>
+                          Name
+                          <RequiredSpan />
+                        </FormLabel>
                         <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "w-[300px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? unis.find((uni) => uni.value === field.value)
-                                  ?.label
-                              : "Select University/School"}
-                            <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
+                          <Input placeholder="John" {...field} />
                         </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[300px] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search uni..." />
-                          <CommandEmpty>
-                            No University/School found.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {unis.map((uni) => (
-                              <CommandItem
-                                value={uni.label}
-                                key={uni.value}
-                                onSelect={() => {
-                                  form.setValue(
-                                    `teammates.${index}.uni`,
-                                    uni.value
-                                  );
-                                }}
-                              >
-                                <CheckIcon
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    uni.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {uni.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.studyYear`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Year of study <RequiredSpan />
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select year of study" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {studyYears.map((item, index) => (
-                          <SelectItem key={index} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.major`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>
-                      Major
-                      <RequiredSpan />
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Computer Science" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.cv`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      CV/Resume Link (Optional)
-                      {/* <RequiredSpan /> */}
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder={DRIVE_PREFIX} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Upload your CV to be shared with our sponsors for
-                      potential employment opportunities.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`teammates.${index}.cert`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Document proving study at an educational institution
-                      {!online && <RequiredSpan />}
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder={DRIVE_PREFIX} {...field} />
-                    </FormControl>
-                    {online ? (
-                      <FormDescription>
-                        Not required for online participation.
-                      </FormDescription>
-                    ) : (
-                      <FormDescription>
-                        You can attach enrollment verification with graduation
-                        date, official/unofficial transcript or Spravka. Must
-                        have a date of September 2023 or later.
-                      </FormDescription>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-        ))}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`teammates.${index}.surname`}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>
+                          Surname
+                          <RequiredSpan />
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.email`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Email
+                        <RequiredSpan />
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="johndoe@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.age`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Age
+                        <RequiredSpan />
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="" inputMode="numeric" {...field} />
+                      </FormControl>
+                      {!online && (
+                        <FormDescription>
+                          16+ for Offline participation.
+                        </FormDescription>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.gender`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Gender <RequiredSpan />
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {genders.map((item, index) => (
+                            <SelectItem key={index} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.uni`}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>University/School</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-[300px] justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? unis.find((uni) => uni.value === field.value)
+                                    ?.label
+                                : "Select University/School"}
+                              <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search uni..." />
+                            <CommandEmpty>
+                              No University/School found.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {unis.map((uni) => (
+                                <CommandItem
+                                  value={uni.label}
+                                  key={uni.value}
+                                  onSelect={() => {
+                                    setUniversity(uni.value);
+                                    form.setValue(
+                                      `teammates.${index}.uni`,
+                                      uni.value
+                                    );
+                                  }}
+                                >
+                                  <CheckIcon
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      uni.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {uni.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.studyYear`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Year of study {university && <RequiredSpan />}
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select year of study" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {studyYears.map((item, index) => (
+                            <SelectItem key={index} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.major`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Major
+                        {university && <RequiredSpan />}
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Computer Science" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.cv`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CV/Resume Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder={DRIVE_PREFIX} {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Upload your CV to be shared with our sponsors for
+                        potential employment opportunities.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`teammates.${index}.cert`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Document proving study at an educational institution
+                        {!online && university && <RequiredSpan />}
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder={DRIVE_PREFIX} {...field} />
+                      </FormControl>
+                      {online ? (
+                        <FormDescription>
+                          Not required for online participation.
+                        </FormDescription>
+                      ) : (
+                        <FormDescription>
+                          You can attach enrollment verification with graduation
+                          date, official/unofficial transcript or Spravka. Must
+                          have a date of September 2024 or later.
+                        </FormDescription>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          );
+        })}
 
         <div>
           <Button

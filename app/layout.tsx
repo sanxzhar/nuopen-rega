@@ -21,14 +21,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
+          forcedTheme="dark"
         >
           <header className="container py-8 flex justify-between">
             <Link href="/">
               <Image
-                src="/hero-logo.svg"
+                src="/logo.svg"
                 width={200}
                 height={32}
                 alt={"nuopen 2023"}
@@ -36,14 +34,9 @@ export default function RootLayout({
             </Link>
             <div className="flex gap-4">
               <Link
-                href="/list"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                <span className="font-bold">Participants</span>
-              </Link>
-              <Link
                 href="https://open.nuacm.kz"
                 className={buttonVariants({ variant: "destructive" })}
+                style={{backgroundColor: '#ED2E3C'}}
               >
                 <span className="font-bold">Home</span>
               </Link>
@@ -53,7 +46,7 @@ export default function RootLayout({
           <main className="flex justify-center px-4 lg:px-0">{children}</main>
 
           <footer className="w-full container flex justify-center py-8 text-muted-foreground text-sm">
-            nuopen 2023 by ACM SC
+            nuopen 2024 by NU ACM SC
           </footer>
         </ThemeProvider>
         <Toaster />

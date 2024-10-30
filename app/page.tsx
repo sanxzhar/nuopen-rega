@@ -7,6 +7,11 @@ export default function Home() {
   return (
     <section className="w-full max-w-xl space-y-8">
       <div>
+        <p className=" text-xl md:text-3xl font-medium text-center">
+          Sorry for inconvenience, registration is temporary closed (
+        </p>
+      </div>
+      <div className="opacity-50">
         <h1 className="text-xl font-bold mb-2">Registration Form</h1>
         <h1 className="text-sm text-muted-foreground mb-2">
           Please fill out everything below.
@@ -31,30 +36,25 @@ export default function Home() {
             </p>
           </CardContent>
         </Card>
-      </div>
-      {/* <div>
-        <p className="text-xl font-medium text-center">
-          Registration is closed
-        </p>
-      </div> */}
-      <Tabs defaultValue="offline">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="offline">
-            <MapPinnedIcon className="w-4 h-4 mr-2" />
-            Offline
-          </TabsTrigger>
-          <TabsTrigger value="online">
-            <GlobeIcon className="w-4 h-4 mr-2" />
-            Online
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="offline">
-          <RegistrationForm online={false} />
-        </TabsContent>
-        <TabsContent value="online">
-          <RegistrationForm online={true} />
-        </TabsContent>
-      </Tabs>
+      </div>          
+        <Tabs defaultValue="offline" className=" opacity-50 pointer-events-none ">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="offline">
+              <MapPinnedIcon className="w-4 h-4 mr-2" />
+              Offline
+            </TabsTrigger>
+            <TabsTrigger value="online">
+              <GlobeIcon className="w-4 h-4 mr-2" />
+              Online
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="offline">
+            <RegistrationForm online={false} />
+          </TabsContent>
+          <TabsContent value="online">
+            <RegistrationForm online={true} />
+          </TabsContent>
+        </Tabs>
     </section>
   );
 }

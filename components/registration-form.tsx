@@ -211,7 +211,7 @@ export default function RegistrationForm({ online }: { online: boolean }) {
         team_name: values.teamName,
         captain_name: values.teammates[0].name,
         captain_surname: values.teammates[0].surname,
-        captain_email: values.teammates[0].email,
+        captian_email: values.teammates[0].email,
         captain_gender: values.teammates[0].gender,
         captain_age: values.teammates[0].age,
         captain_uni: values.teammates[0].uni,

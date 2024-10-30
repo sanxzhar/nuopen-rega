@@ -8,7 +8,7 @@ export default function Home() {
     <section className="w-full max-w-xl space-y-8">
       <div>
         <p className=" text-xl md:text-3xl font-medium text-center">
-          Sorry for inconvenience, registration is temporary closed (
+          Sorry for inconvenience, please proceed to the <a className="underline " href="https://forms.gle/XP2tu5mHKFq1Hb1TA">new registration form</a>.
         </p>
       </div>
       <div className="opacity-50">
